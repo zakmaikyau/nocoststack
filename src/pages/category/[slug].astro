@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import { categories, toolsInCategory } from '../../data/tools';
+
+export function getStaticPaths() {
+  return categories
+    .filter((c) => toolsInCategory(c.slug).length > 0)
+    .map((category) => ({ params: { slug: category.slug }, props: { category } }));
+}
+
+const { category } = Astro.props;
+const tools = toolsInCategory(category.slug);
+---
+<Base
+  title={`Free alternatives: ${category.name}`}
+  description={`Free and open-source alternatives to paid ${category.name.toLowerCase()} software.`}
+>
+  <p class="crumbs"><a href="/">Home</a> / {category.name}</p>
+  <h1>{category.name}: free alternatives</h1>
+  <div class="grid">
+    {tools.map((t) => (
+      <a class="card" href={`/alternatives/${t.slug}/`}>
+        <strong>Free alternatives to {t.name}</strong>
+        <p>{t.alternatives.map((a) => a.name).join(', ')}</p>
+      </a>
+    ))}
+  </div>
+</Base>

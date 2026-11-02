@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import Search from '../components/Search.astro';
+import { paidTools, categories } from '../data/tools';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'NoCostStack',
+  url: 'https://nocoststack.tech/',
+};
+---
+<Base
+  title="NoCostStack: free alternatives to paid software"
+  description="Find free and open-source alternatives to popular paid software, with honest notes on what each one does well and where it falls short."
+  jsonLd={jsonLd}
+>
+  <h1>Free alternatives to the software you pay for</h1>
+  <p class="lead">
+    Pick a paid tool and see free or open-source options, what each is best for, and where the free
+    version has limits.
+  </p>
+
+  <Search />
+
+  <h2 id="browse">Browse by category</h2>
+  {categories.map((c) => {
+    const tools = paidTools.filter((t) => t.category === c.slug);
+    if (!tools.length) return null;
+    return (
+      <section>
+        <h3><a href={`/category/${c.slug}/`}>{c.name}</a></h3>
+        <div class="grid">
+          {tools.map((t) => (
+            <a class="card" href={`/alternatives/${t.slug}/`}>
+              <strong>Free alternatives to {t.name}</strong>
+              <p>{t.alternatives.map((a) => a.name).join(', ')}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    );
+  })}
+</Base>

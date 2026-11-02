@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro';
+import { paidTools, getCategory } from '../../data/tools';
+
+export function getStaticPaths() {
+  return paidTools.map((tool) => ({ params: { slug: tool.slug }, props: { tool } }));
+}
+
+const { tool } = Astro.props;
+const category = getCategory(tool.category);
+const names = tool.alternatives.map((a) => a.name);
+const related = paidTools.filter((t) => t.category === tool.category && t.slug !== tool.slug);
+const hasAffiliate = tool.affiliateUrl || tool.alternatives.some((a) => a.affiliate);
+const rel = (aff?: boolean) => (aff ? 'sponsored noopener' : 'noopener');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: `Free alternatives to ${tool.name}`,
+  itemListElement: tool.alternatives.map((a, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: a.name,
+    url: a.url,
+  })),
+};
+---
+<Base
+  title={`Free alternatives to ${tool.name}`}
+  description={`Free and open-source alternatives to ${tool.name}: ${names.join(', ')}. See what each is best for and the limits to know about.`}
+  jsonLd={jsonLd}
+>
+  <p class="crumbs">
+    <a href="/">Home</a> / <a href={`/category/${tool.category}/`}>{category?.name}</a>
+  </p>
+  <h1>Free alternatives to {tool.name}</h1>
+  <p class="lead">
+    {tool.name}: {tool.tagline} Here are {names.length} free or open-source options.
+  </p>
+
+  {hasAffiliate && (
+    <p class="notice">This page contains affiliate links. See our <a href="/disclosure/">disclosure</a>.</p>
+  )}
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Tool</th><th>Type</th><th>Best for</th></tr>
+      </thead>
+      <tbody>
+        {tool.alternatives.map((a) => (
+          <tr><td>{a.name}</td><td>{a.license}</td><td>{a.bestFor}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>The alternatives in detail</h2>
+  {tool.alternatives.map((a) => (
+    <article class="alt">
+      <h3>{a.name} <span class="tag">{a.license}</span></h3>
+      <p>{a.summary}</p>
+      <dl>
+        <dt>Best for</dt><dd>{a.bestFor}</dd>
+        <dt>Limits to know</dt><dd>{a.limits}</dd>
+      </dl>
+      <a class="btn" href={a.url} rel={rel(a.affiliate)} target="_blank">Visit {a.name}</a>
+    </article>
+  ))}
+
+  <h2>When is {tool.name} still worth paying for?</h2>
+  <p>
+    A free option is often enough, but not always. If you depend on specific features, file
+    compatibility or support, check the limits above first.
+    <a href={tool.affiliateUrl ?? tool.paidUrl} rel={rel(!!tool.affiliateUrl)} target="_blank">Visit {tool.name}</a>
+    to compare.
+  </p>
+
+  {related.length > 0 && (
+    <>
+      <h2>More in {category?.name}</h2>
+      <div class="grid">
+        {related.map((r) => (
+          <a class="card" href={`/alternatives/${r.slug}/`}>
+            <strong>Free alternatives to {r.name}</strong>
+          </a>
+        ))}
+      </div>
+    </>
+  )}
+</Base>

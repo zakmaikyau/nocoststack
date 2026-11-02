@@ -1,0 +1,137 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  jsonLd?: object;
+}
+const { title, description, jsonLd } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const fullTitle = title.includes('NoCostStack') ? title : `${title} | NoCostStack`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap bar">
+        <a class="brand" href="/">NoCost<span>Stack</span></a>
+        <nav aria-label="Main">
+          <a href="/#browse">Browse</a>
+          <a href="/about/">About</a>
+          <a href="/disclosure/">Disclosure</a>
+        </nav>
+      </div>
+    </header>
+    <main class="wrap">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>
+          NoCostStack lists free and open-source alternatives to paid software. Some links may be
+          affiliate links, which can earn us a commission at no extra cost to you.
+          <a href="/disclosure/">Read our disclosure</a>.
+        </p>
+        <p class="small">&copy; {new Date().getFullYear()} NoCostStack. Product names belong to their owners.</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #f8fafb;
+    --surface: #ffffff;
+    --text: #14202b;
+    --muted: #55636f;
+    --line: #dde4ea;
+    --accent: #0f766e;
+    --accent-ink: #ffffff;
+    --tag: #e6f4f1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1418;
+      --surface: #141d23;
+      --text: #e8eef2;
+      --muted: #9aabb6;
+      --line: #25343d;
+      --accent: #2dd4bf;
+      --accent-ink: #062a26;
+      --tag: #12312d;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+  .site-header { border-bottom: 1px solid var(--line); background: var(--surface); }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 60px; flex-wrap: wrap; }
+  .brand { font-weight: 800; font-size: 1.25rem; text-decoration: none; color: var(--text); }
+  .brand span { color: var(--accent); }
+  nav a { margin-left: 16px; color: var(--muted); text-decoration: none; font-size: 0.95rem; }
+  nav a:hover { color: var(--text); }
+  main { padding-top: 32px; padding-bottom: 48px; min-height: 60vh; }
+  h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.2; margin: 0 0 12px; }
+  h2 { font-size: 1.35rem; margin: 40px 0 12px; }
+  h3 { margin: 0 0 6px; }
+  section + section { margin-top: 28px; }
+  section > h3 { margin-bottom: 10px; }
+  .lead { color: var(--muted); font-size: 1.1rem; max-width: 60ch; }
+  .crumbs { font-size: 0.9rem; color: var(--muted); margin-bottom: 12px; }
+  .crumbs a { color: var(--muted); }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px; text-decoration: none; color: inherit; display: block;
+  }
+  a.card:hover { border-color: var(--accent); }
+  .card p { margin: 4px 0 0; color: var(--muted); font-size: 0.95rem; }
+  .tag {
+    display: inline-block; background: var(--tag); color: var(--accent);
+    border-radius: 999px; padding: 2px 10px; font-size: 0.78rem; font-weight: 600;
+  }
+  .alt { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+  .alt dl { margin: 12px 0 0; display: grid; gap: 6px; }
+  .alt dt { font-weight: 600; font-size: 0.85rem; color: var(--muted); }
+  .alt dd { margin: 0 0 6px; }
+  .btn {
+    display: inline-block; background: var(--accent); color: var(--accent-ink);
+    padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 8px;
+  }
+  .search { margin: 24px 0 8px; }
+  .search input {
+    width: 100%; padding: 12px 14px; font-size: 1rem; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--text);
+  }
+  .search input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .results { list-style: none; padding: 0; margin: 8px 0 0; }
+  .results li a { display: block; padding: 10px 12px; border-radius: 8px; text-decoration: none; color: var(--text); }
+  .results li a:hover { background: var(--tag); }
+  .results small { color: var(--muted); display: block; }
+  .site-footer { border-top: 1px solid var(--line); background: var(--surface); padding: 24px 0; color: var(--muted); font-size: 0.9rem; }
+  .small { font-size: 0.8rem; }
+  .notice { background: var(--tag); border-radius: 10px; padding: 12px 14px; font-size: 0.92rem; margin: 16px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .table-scroll { overflow-x: auto; }
+</style>
